@@ -13,24 +13,26 @@ import "./../app/utils/Notification/notification";
 let initialized = false;
 
 const startServer = async () => {
-  try {
-    if (initialized) return;
-    initialized = true;
+    try {
+        if (initialized) return;
+        initialized = true;
 
-    // Redis connect
-    await redisClient.connect();
-    console.log("Redis connected");
+        // Redis connect
+        if (!redisClient.isOpen) {
+            await redisClient.connect();
+            console.log("Redis connected")
+        }
 
-    // MongoDB connect
-    await mongoose.connect(envVars.MONGO_DB_URL as string);
-    console.log("MongoDB Connected!");
+        // MongoDB connect
+        await mongoose.connect(envVars.MONGO_DB_URL as string);
+        console.log("MongoDB Connected!");
 
-    // seed only once
-    await seedSuperAdmin();
+        // seed only once
+        await seedSuperAdmin();
 
-  } catch (error) {
-    console.error("Server init failed:", error);
-  }
+    } catch (error) {
+        console.error("Server init failed:", error);
+    }
 };
 
 // auto init (safe for serverless)
@@ -40,7 +42,7 @@ app.set("trust proxy", 1);
 
 // routes
 app.get("/", async (req: Request, res: Response) => {
-  res.status(200).json({ message: "News server is running!" });
+    res.status(200).json({ message: "News server is running!" });
 });
 
 app.use(limiter);
@@ -52,19 +54,19 @@ app.use(globalErrorHandler);
 // fallback error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({
-    message: err.message,
-    success: false,
-  });
+    res.status(500).json({
+        message: err.message,
+        success: false,
+    });
 });
 
 // shutdown logic (kept but not useful in Vercel, harmless)
 const shutdown = (signal: string, err?: any) => {
-  console.log(`${signal} detected. Shutting down...`);
+    console.log(`${signal} detected. Shutting down...`);
 
-  if (err) console.error(err);
+    if (err) console.error(err);
 
-  process.exit(1);
+    process.exit(1);
 };
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));
