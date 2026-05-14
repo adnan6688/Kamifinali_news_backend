@@ -23,6 +23,7 @@ const startServer = async () => {
             console.log("Redis connected")
         }
 
+        console.log(envVars.REDIS_URL)
         // MongoDB connect
         await mongoose.connect(envVars.MONGO_DB_URL as string);
         console.log("MongoDB Connected!");
