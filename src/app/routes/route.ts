@@ -7,6 +7,7 @@ import { VideoRoute } from "../modules/Videos/video.route";
 import { CTRRoute } from "../modules/CTRAndImpression/ctr.route";
 import { passwordRoute } from "../modules/Password/password.route";
 import { TrackRoute } from "../modules/UserTrack/track.route";
+import { BookRoutes } from "../modules/BookMarks/bookmarks.route";
 
 
 
@@ -39,8 +40,11 @@ const modulesRoute = [
         path: '/password',
         route: passwordRoute
     }, {
-        path : '/track',
-        route : TrackRoute
+        path: '/track',
+        route: TrackRoute
+    }, {
+        path: '/bookMarks',
+        route: BookRoutes
     }
 ]
 
