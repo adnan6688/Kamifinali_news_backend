@@ -1,14 +1,10 @@
-
-
-
-import  { createClient } from 'redis'
-
+import { createClient } from "redis";
+import { envVars } from "./env";
 
 export const redisClient = createClient({
-    url: 'redis://127.0.0.1:6379'
-})
+  url: envVars.REDIS_URL,
+});
 
 redisClient.on("error", (err) => {
-    // eslint-disable-next-line no-console
-    console.log("Redis Error:", err);
+  console.log("Redis Error:", err);
 });

@@ -17,6 +17,7 @@ interface EnvConfig {
     CLOUD_NAME: string,
     CLOUD_API_SECRET: string,
 
+    REDIS_URL : string,
 
     TYPE : string,
     PROJECT_ID: string, //firebase config
@@ -43,7 +44,7 @@ const LoadEnvVariables = (): EnvConfig => {
         'PASSWORD_HASH_SALT', 'NODE_ENV', 'JWT_ACCESS_EXPIRES',
         'JWT_ACCESS_SECRET', 'CLOUD_API_KEY', 'CLOUD_NAME', 'CLOUD_API_SECRET',
         'PROJECT_ID', 'PRIVATE_KEY_ID', 'PRIVATE_KEY', 'CLIENT_EMAIL', 'CLIENT_ID', 'AUTH_URI',
-        'TOKEN_URI', 'AUTH_PROVIDER_X509_CART_URL', 'CLIENT_X509_CERT_URL', 'UNIVERSE_DOMAIN','TYPE'
+        'TOKEN_URI', 'AUTH_PROVIDER_X509_CART_URL', 'CLIENT_X509_CERT_URL', 'UNIVERSE_DOMAIN','TYPE', 'REDIS_URL'
     ]
 
 
@@ -88,6 +89,9 @@ const LoadEnvVariables = (): EnvConfig => {
         PRIVATE_KEY : process.env.PRIVATE_KEY as string,
         PRIVATE_KEY_ID : process.env.PRIVATE_KEY_ID as string,
         PROJECT_ID : process.env.PROJECT_ID as string,
+
+
+        REDIS_URL : process.env.REDIS_URL as string
 
     }
 }
