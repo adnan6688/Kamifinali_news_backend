@@ -1,65 +1,39 @@
-import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import { app } from "./app";
 import { redisClient } from "./config/redis";
-import { router } from "./routes/route";
-import { limiter } from "./utils/rateLimiting";
-import mongoose from "mongoose";
 import { envVars } from "./config/env";
 import { seedSuperAdmin } from "./utils/seedSuperAdmin";
-import { globalErrorHandler } from "./Middleware/global.error.handler";
-import "./../app/utils/Notification/notification";
 
+import "./utils/Notification/notification";
 
-let initialized = false;
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
-    try {
-        if (initialized) return;
-        initialized = true;
-
-        // Redis connect
-        if (!redisClient.isOpen) {
-            await redisClient.connect();
-            console.log("Redis connected")
-        }
-
-        console.log(envVars.REDIS_URL)
-        // MongoDB connect
-        await mongoose.connect(envVars.MONGO_DB_URL as string);
-        console.log("MongoDB Connected!");
-
-        // seed only once
-        await seedSuperAdmin();
-
-    } catch (error) {
-        console.error("Server init failed:", error);
+  try {
+    // Redis connect
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+      console.log("Redis connected");
     }
+
+    // MongoDB connect
+    await mongoose.connect(envVars.MONGO_DB_URL as string);
+    console.log("MongoDB Connected!");
+
+    // seed admin
+    await seedSuperAdmin();
+
+    // local server only
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.log("Server error:", error);
+  }
 };
 
-// auto init (safe for serverless)
 startServer();
-
-app.set("trust proxy", 1);
-
-// routes
-app.get("/", async (req: Request, res: Response) => {
-    res.status(200).json({ message: "News server is running!" });
-});
-
-app.use(limiter);
-app.use("/api/v1", router);
-
-// global error handler
-app.use(globalErrorHandler);
-
-// fallback error handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    res.status(500).json({
-        message: err.message,
-        success: false,
-    });
-});
 
 // shutdown logic (kept but not useful in Vercel, harmless)
 const shutdown = (signal: string, err?: any) => {
