@@ -39,6 +39,7 @@ const getForYouNews = async (userId: Types.ObjectId, query: Record<string, strin
 
     const topTrack = await UserTrack.find({ userId }).sort({ Score: -1 });
 
+    console.log(topTrack)
 
     const weightMap: Record<string, number> = {};
 
@@ -53,6 +54,7 @@ const getForYouNews = async (userId: Types.ObjectId, query: Record<string, strin
     const baseQuery = News.find({
         categorySlugs: { $in: slugs }
     });
+    console.log('slugs',slugs)
 
 
 
