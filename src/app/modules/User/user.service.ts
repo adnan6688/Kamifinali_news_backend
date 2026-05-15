@@ -37,38 +37,44 @@ const userCreated = async (payload: Partial<IUser>) => {
 
 
 const loginUser = async (payload: Partial<IUser>) => {
-
-
-    const { email, password } = payload
+    const { email, password } = payload;
 
     if (!email || !password) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Email and password are required`)
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "Email and password are required"
+        );
     }
 
-    const ckUser = await User.findOne({ email })
+    const ckUser = await User.findOne({ email });
 
     if (!ckUser) {
-        throw new AppError(httpStatus.NOT_FOUND, 'User Not found!')
+        throw new AppError(httpStatus.NOT_FOUND, "User Not found!");
     }
-    const compare = bcrypt.compare((password) as string, ckUser.password as string)
+
+    const compare = await bcrypt.compare(
+        password as string,
+        ckUser.password as string
+    );
+
     if (!compare) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match!')
+        throw new AppError(httpStatus.BAD_REQUEST, "Password does not match!");
     }
 
-
-    return ckUser
-}
+    return ckUser;
+};
 
 
 const getMe = async (userId: Types.ObjectId) => {
 
-    const ckUser = await User.findById(userId)
+    const ckUser = await User.findById(userId).select("-password");
     if (!ckUser) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found!')
     }
     if (ckUser.role == UserType.GUEST) {
         ckUser.name = 'Anonymous User'
     }
+
     return ckUser
 }
 

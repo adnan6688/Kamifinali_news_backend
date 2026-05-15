@@ -3,25 +3,23 @@ import { UserTrack } from "./track.model";
 import { ActionType } from "./track.interface";
 
 import { News } from "../RecentNews/news.model";
-import { QueryBuilder } from "../../utils/QuiryBuilder";
 
 
+export const clickAndViews = async (
+    userId: Types.ObjectId,
+    categorySlug: string,
+    action: ActionType
+) => {
+    const slug = categorySlug.toLowerCase();
 
-
-
-const clickAndViews = async (userId: Types.ObjectId, categorySlug: string, action: ActionType) => {
-
-    const update: any = {
-        $inc: {}
-    };
+    const update: any = {};
 
     if (action === ActionType.CLICK) {
-        update.$inc.Clicks = 1;
-        update.$inc.Score = 3;
+        update.$inc = { Clicks: 1 };
     }
-    
+
     const result = await UserTrack.findOneAndUpdate(
-        { userId, categorySlug },
+        { userId, categorySlug: slug },
         update,
         {
             upsert: true,
@@ -35,48 +33,81 @@ const clickAndViews = async (userId: Types.ObjectId, categorySlug: string, actio
 
 
 
-const getForYouNews = async (userId: Types.ObjectId, query: Record<string, string>) => {
 
-    const topTrack = await UserTrack.find({ userId }).sort({ Score: -1 });
+export const getForYouNews = async (userId: Types.ObjectId, query: Record<string, any>) => {
 
-    console.log(topTrack)
+    // 1. get user clicks
+    const tracks = await UserTrack.find({ userId }).sort({ Clicks: -1 });
 
-    const weightMap: Record<string, number> = {};
+    const slugs = tracks.map(t => t.categorySlug.toLowerCase());
 
-    topTrack.forEach((t) => {
-        weightMap[t.categorySlug] = t.Score;
-    });
+    if (!slugs.length) {
+        return {
+            data: [],
+            meta: { total: 0 },
+        };
+    }
 
+    // 2. pagination
+    const page = Number(query.page || 1);
+    const limit = Number(query.limit || 10);
+    const skip = (page - 1) * limit;
 
-    const slugs = Object.keys(weightMap);
+    // 3. MAIN FIX (safe match)
+    const data = await News.aggregate([
+        {
+            $match: {
+                categorySlugs: {
+                    $in: slugs
+                }
+            }
+        },
 
+        {
+            $addFields: {
+                weight: {
+                    $size: {
+                        $filter: {
+                            input: "$categorySlugs",
+                            as: "c",
+                            cond: { $in: ["$$c", slugs] }
+                        }
+                    }
+                }
+            }
+        },
 
-    const baseQuery = News.find({
-        categorySlugs: { $in: slugs }
-    });
-    console.log('slugs',slugs)
+        {
+            $sort: {
+                weight: -1,
+                createdAt: -1
+            }
+        },
 
-
-
-    const newsQuery = new QueryBuilder(baseQuery, query)
-        .search(['title', 'description'])
-        .fields()
-        .sort()
-        .paginate()
-        .populate([{ path: 'author', select: 'name image' }]);
-
-    const [data, meta] = await Promise.all([
-        newsQuery.build(),
-        newsQuery.getMeta()
+        { $skip: skip },
+        { $limit: limit },
+        {
+            $project: {
+                weight: 0
+            }
+        }
     ]);
 
+    // 8. meta
+    const total = await News.countDocuments({
+        categorySlugs: { $in: slugs },
+    });
 
     return {
         data,
-        meta,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPage: Math.ceil(total / limit),
+        },
     };
 };
-
 
 
 

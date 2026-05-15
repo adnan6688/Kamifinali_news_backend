@@ -39,7 +39,7 @@ export const checkAuth = async (req: Request, res: Response, next: NextFunction)
     try {
         const token =
             req?.headers?.authorization?.split(" ")[1] ||
-            req?.cookies?.accessToken || req?.headers?.authorization;
+            req?.cookies?.Token || req?.headers?.authorization;
 
 
         //  NO TOKEN → CREATE GUEST USER IN DB

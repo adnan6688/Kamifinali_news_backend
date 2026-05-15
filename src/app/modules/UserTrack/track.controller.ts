@@ -23,8 +23,6 @@ const clickAndViews = catchAsync(async (req: Request, res: Response, next: NextF
     if (!ckSlug) {
         throw new AppError(statusCode.NOT_FOUND, 'This category Not found!')
     }
-
-    console.log("click views" , req.headers)
     
     await UserTrackSerive.clickAndViews(userId as Types.ObjectId, slug as string, action as ActionType)
 

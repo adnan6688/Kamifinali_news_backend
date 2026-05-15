@@ -47,6 +47,12 @@ const loginController = catchAsync(async (req: Request, res: Response, next: Nex
 
     const token = await createUserTokens(payload)
 
+    res.cookie("Token", token.accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+    });
+
     sendResponse(res, {
         success: true,
         data: {
@@ -60,31 +66,31 @@ const loginController = catchAsync(async (req: Request, res: Response, next: Nex
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getMe = catchAsync(async(req : Request , res : Response , next : NextFunction)=>{
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
-    const userId = req.user.id 
+    const userId = req.user.id
     const result = await UserSerivce.getMe(userId as Types.ObjectId)
 
-    sendResponse(res , {
-        statusCode  : httpStatus.OK,
-        message : "Personal Information!!",
-        success : true,
-        data : result
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: "Personal Information!!",
+        success: true,
+        data: result
     })
 
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const updateUserInformation = catchAsync(async(req : Request , res : Response , next : NextFunction)=>{
+const updateUserInformation = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    const userId = req.user.id 
-    await UserSerivce.updateUserInformation(userId as Types.ObjectId , req.body)
+    const userId = req.user.id
+    await UserSerivce.updateUserInformation(userId as Types.ObjectId, req.body)
 
     sendResponse(res, {
-        success : true,
-        message : 'information update successfully!',
-        statusCode : httpStatus.OK
+        success: true,
+        message: 'information update successfully!',
+        statusCode: httpStatus.OK
     })
 })
 

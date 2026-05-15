@@ -7,6 +7,7 @@ const staticCategories = [
     { id: 90003, name: "Trending", slug: "trending" },
     { id: 90004, name: "National", slug: "national"},
     { id: 90005, name: "Business", slug: "business"},
+    { id: 900036, name: "News", slug: "news"},
 ];
 
 const getAllCategories = async () => {
