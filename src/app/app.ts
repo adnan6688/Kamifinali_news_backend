@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from "express";
 import { router } from "./routes/route";
 import { limiter } from "./utils/rateLimiting";
 import { globalErrorHandler } from "./Middleware/global.error.handler";
-
+import cookieParser from 'cookie-parser'
 export const app = express();
 
 app.use(
@@ -16,6 +16,8 @@ app.use(
 );
 app.use(express.json());
 
+
+app.use(cookieParser());
 app.set("trust proxy", 1);
 
 // health check route

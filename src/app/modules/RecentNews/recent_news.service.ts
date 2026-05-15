@@ -80,7 +80,7 @@ const getAllRecentNewsService = async (per_page?: number, page?: number, search?
 
             const obj = {
                 id: post.id,
-                date: post.date,
+                createdAt: post.date,
                 title: cleanText(post.title?.rendered),
                 description: cleanText(post.content?.rendered),
                 image: post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
@@ -203,11 +203,11 @@ type NewsItem = {
 
 
 type BreakingNewsDTO = {
-  newsId: number;
-  title: string;
-  link: string;
-  image: string;
-  date: Date;
+    newsId: number;
+    title: string;
+    link: string;
+    image: string;
+    date: Date;
 };
 
 const checkBreakingNewsIntoDB = async () => {
@@ -244,13 +244,13 @@ const checkBreakingNewsIntoDB = async () => {
                 date: item.date,
             });
 
-          newlyAddedNews.push(savedNews.toObject() as BreakingNewsDTO);
+            newlyAddedNews.push(savedNews.toObject() as BreakingNewsDTO);
         }
     }
 
-    const allNews = await BreakingNews.find().sort({
-        createdAt: -1,
-    });
+    const allNews = await BreakingNews.find()
+        .sort({ createdAt: -1 })
+        .limit(20);
 
     return {
         newlyAddedNews,
