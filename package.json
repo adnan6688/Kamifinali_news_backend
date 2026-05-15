@@ -8,7 +8,7 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/app/server.ts",
     "lint": "npx eslint ./src",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/app/server.js"
   },
   "keywords": [],
   "author": "",
