@@ -174,37 +174,51 @@ const getNewsDetailsService = async (postId: number) => {
 };
 
 
+type MediaResponse = {
+    source_url: string;
+};
+
 const getImage = async (mediaId: number) => {
     try {
         const res = await fetch(
             `https://www.kemifilani.ng/wp-json/wp/v2/media/${mediaId}`
         );
 
-        const data = await res.json();
+        const data = (await res.json()) as MediaResponse;
         return data.source_url;
     } catch (err: any) {
         return null;
     }
 };
 
+type NewsItem = {
+    id: string;
+    date: string; // API gives string, NOT Date
+    link: string;
+    title: {
+        rendered: string;
+    };
+    featured_media: number;
+};
+
+
+type BreakingNewsDTO = {
+  newsId: number;
+  title: string;
+  link: string;
+  image: string;
+  date: Date;
+};
 
 const checkBreakingNewsIntoDB = async () => {
     const res = await fetch(
         "https://www.kemifilani.ng/wp-json/wp/v2/posts?_fields=id,title,link,date,featured_media&per_page=5"
     );
 
-    const data = await res.json();
+    const data = (await res.json()) as NewsItem[];
 
     const enrichedData = await Promise.all(
-        data.map(async (item: {
-            id: string,
-            date: Date,
-            link: string,
-            title: {
-                rendered: string
-            },
-            featured_media: number
-        }) => {
+        data.map(async (item) => {
             const image = await getImage(item.featured_media);
 
             return {
@@ -214,23 +228,23 @@ const checkBreakingNewsIntoDB = async () => {
         })
     );
 
-    const newlyAddedNews = [];
+    const newlyAddedNews: BreakingNewsDTO[] = [];
 
     for (const item of enrichedData) {
         const exists = await BreakingNews.findOne({
-            newsId: item.id,
+            newsId: Number(item.id),
         });
 
         if (!exists) {
             const savedNews = await BreakingNews.create({
-                newsId: item.id,
+                newsId: Number(item.id),
                 title: cleanText(item.title.rendered),
                 link: item.link,
                 image: item.image,
                 date: item.date,
             });
 
-            newlyAddedNews.push(savedNews);
+          newlyAddedNews.push(savedNews.toObject() as BreakingNewsDTO);
         }
     }
 
