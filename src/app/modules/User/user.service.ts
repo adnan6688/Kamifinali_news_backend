@@ -5,6 +5,8 @@ import httpStatus from 'http-status-codes'
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
 import { Types } from "mongoose";
+import { News } from "../RecentNews/news.model";
+import { BreakingNews } from "../RecentNews/recent.interface";
 
 
 
@@ -108,9 +110,84 @@ const updateUserInformation = async (userId: Types.ObjectId, info: Partial<IUser
 };
 
 
+
+const countOfUserRoleWise = async () => {
+
+
+    const totalUser = (await User.find({ role: { $ne: UserType.ADMIN } })).length
+    const GUESTUser = (await User.find({ role: UserType.GUEST })).length
+    const authencticateUser = (await User.find({ role: UserType.USER })).length
+
+    const totalNews = (await News.find()).length
+
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+
+    const todayBreakingNews = await BreakingNews.find({
+        createdAt: { $gte: today }
+    });
+
+    const count = todayBreakingNews.length;
+
+
+    return {
+        totalNews,
+        GUESTUser,
+        authencticateUser,
+        totalUser,
+        todayBreakingNews: count
+    }
+
+}
+
+
+
+const getMonthlyUserStats = async (year: number) => {
+    const start = new Date(`${year}-01-01`);
+    const end = new Date(`${year}-12-31T23:59:59.999Z`);
+
+    const data = await User.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: start,
+                    $lte: end,
+                },
+            },
+        },
+        {
+            $group: {
+                _id: { $month: "$createdAt" },
+                totalUsers: { $sum: 1 },
+            },
+        },
+        {
+            $sort: { _id: 1 },
+        },
+    ]);
+
+    return data;
+};
+
+
+const recentUsers = async () => {
+    const users = await User.find()
+        .sort({ createdAt: -1 }).select('-password -breakingNewsNotification -birthDayNotification -deviceId -updatedAt -fcmToken')
+        .limit(6);
+
+    return users;
+};
+
+
+
 export const UserSerivce = {
     userCreated,
     loginUser,
     getMe,
-    updateUserInformation
+    updateUserInformation,
+    countOfUserRoleWise,
+    getMonthlyUserStats,
+    recentUsers
 }

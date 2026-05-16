@@ -1,15 +1,4 @@
-// {
-//   "compilerOptions": {
-//     "target": "ES6",
-//     "module": "commonjs",
-//     "rootDir": ".",
-//     "outDir": "./dist",
-//     "esModuleInterop": true,
-//     "strict": true,
-//     "skipLibCheck": true
-//   },
-//   "include": ["src", "api"]
-// }
+
 {
   "compilerOptions": {
     "target": "ES2020",

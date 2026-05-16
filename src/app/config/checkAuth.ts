@@ -20,7 +20,7 @@ const guestUserMake = async (devId: string) => {
 
     const guestUser = await User.create({
         deviceId: devId as string,
-        name: "Guest",
+        name: "Anonymous User",
         email: `guest_${Date.now()}_${Math.random()}.temp@system.com`,
         password: "",
         role: UserType.GUEST,
@@ -42,7 +42,7 @@ export const checkAuth = async (req: Request, res: Response, next: NextFunction)
             req?.cookies?.Token || req?.headers?.authorization;
 
             
-            console.log(token )
+       
 
         //  NO TOKEN → CREATE GUEST USER IN DB
         if (!token) {

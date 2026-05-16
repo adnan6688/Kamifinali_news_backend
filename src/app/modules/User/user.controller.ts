@@ -95,10 +95,75 @@ const updateUserInformation = catchAsync(async (req: Request, res: Response, nex
 })
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const adminInformationForDashboard = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+
+    const result = await UserSerivce.countOfUserRoleWise()
+    sendResponse(res, {
+        success: true,
+        message: 'successfully information get',
+        data: result,
+        statusCode: httpStatus.OK
+    })
+})
+
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const userAnalytics = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const year = Number(req.query.year) || new Date().getFullYear();
+
+
+    const result = await UserSerivce.getMonthlyUserStats(year);
+
+    // convert to graph-friendly format
+    const formatted = Array.from({ length: 12 }, (_, i) => {
+        const found = result.find((r) => r._id === i + 1);
+
+        return {
+            month: i + 1,
+            users: found ? found.totalUsers : 0,
+        };
+    });
+
+
+    sendResponse(res, {
+        success: true,
+        message: 'Get user Analytics',
+        data: formatted,
+        statusCode: httpStatus.OK
+    })
+
+})
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const recentUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const data = await UserSerivce.recentUsers()
+
+
+    sendResponse(res, {
+        data,
+        message: 'Recent Five users',
+        success: true,
+        statusCode: httpStatus.OK
+    })
+
+})
+
 
 export const userController = {
     userCreate,
     loginController,
     getMe,
-    updateUserInformation
+    updateUserInformation,
+    adminInformationForDashboard,
+    userAnalytics,
+    recentUsers
 }
