@@ -12,8 +12,8 @@ const CTRSchema = new Schema<ICTRANDIMPRESSION>({
     impressions: { type: Number, default: 0 },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: [true, 'user must be included'] },
     type: { type: String, enum: ctrType, required: [true, 'type must be included!'] },
-    newsId: { type: Schema.Types.ObjectId }, 
-    bannarsId : {type : Schema.Types.ObjectId}
+    newsId: { type: Schema.Types.ObjectId , ref : 'News' }, 
+    bannarsId : {type : Schema.Types.ObjectId , ref : 'Bannar'}
 }, {
     versionKey: false,
     timestamps: true

@@ -13,4 +13,7 @@ route.post('/upload-video' , checkAuth, isAdmin,  videoController.videoUpload)
 route.delete('/delete-video/:id' , isAdmin,  videoController.deleteVideo)
 route.get('/getvideos' , checkAuth,  videoController.getAllVideos)
 
+
+route.get('/recentAddedvideo' , checkAuth , isAdmin , videoController.recentAddedVideo)
+
 export const VideoRoute = route

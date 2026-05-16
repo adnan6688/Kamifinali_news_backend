@@ -69,8 +69,24 @@ const deleteBannar = catchAsync(async (req: Request, res: Response,next : NextFu
     })
 })
 
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const recenAddedBannar = catchAsync(async (req : Request , res : Response , next :  NextFunction)=>{
+
+    const result = await BannarService.recenAddedBannar()
+
+    sendResponse(res, {
+        success : true,
+        message : 'Recent Added Bannar',
+        data : result , 
+        statusCode : statusCode.OK
+    })
+})
+
 export const bannerController = {
     bannerCreate,
     getBannars,
-    deleteBannar
+    deleteBannar,
+    recenAddedBannar
 }

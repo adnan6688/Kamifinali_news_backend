@@ -1,6 +1,7 @@
 
+import { QueryBuilder } from "../../utils/QuiryBuilder";
 import { CTRIMPRESSION } from "./ctr.model";
-import {  ICTRANDIMPRESSION, TAction } from "./cts.interface";
+import { ICTRANDIMPRESSION, TAction } from "./cts.interface";
 
 
 
@@ -53,7 +54,46 @@ export const ctr = async (payload: Partial<ICTRANDIMPRESSION>, action: TAction) 
 };
 
 
+export const getCTRAnalytics = async (
+    query: Record<string, string>
+) => {
+
+    const queryBuilder = new QueryBuilder(
+        CTRIMPRESSION.find()
+            .populate('newsId' , '-categorySlugs -category -description -updatedAt -id')
+            .populate('bannarsId' , '-publicId -updatedAt -createdAt')
+            .populate('user' , '-birthDayNotification -birth_date -breakingNewsNotification -createdAt -deviceId -fcmToken -updatedAt -password -isDelete'),
+        query
+    )
+        .search([])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const data = await queryBuilder.modelQuery;
+
+    const modifiedData = data.map((item: any) => {
+
+        const clicks = item.clicks || 0;
+        const impressions = item.impressions || 0;
+
+        const ctr =
+            impressions > 0
+                ? ((clicks / impressions) * 100).toFixed(2)
+                : "0.00";
+
+        return {
+            ...item.toObject(),
+            ctr: `${ctr}%`,
+        };
+    });
+
+    return modifiedData;
+};
+
 export const ctrService = {
 
-    ctr
+    ctr,
+    getCTRAnalytics
 }

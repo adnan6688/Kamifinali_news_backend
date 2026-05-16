@@ -125,8 +125,18 @@ const getAllVideos = async (query: Record<string, string>) => {
     }
 }
 
+
+
+const recentAddedVideo = async () => {
+
+    const result = await VideoModel.find().sort({ createdAt: -1 }).limit(3)
+
+    return result || []
+}
+
 export const videoService = {
     getYoutubeData,
     deleteVideo,
-    getAllVideos
+    getAllVideos,
+    recentAddedVideo
 }

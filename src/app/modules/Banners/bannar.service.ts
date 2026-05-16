@@ -42,9 +42,19 @@ const deleteBannar = async (bannarId: Types.ObjectId) => {
 }
 
 
+const recenAddedBannar  = async ()=>{
+
+
+    const res = await Bannar.find().sort({createdAt : -1}).limit(3)
+
+    return res || []
+}
+
+
 
 export const BannarService = {
     bannarService,
     getBannars,
-    deleteBannar
+    deleteBannar,
+    recenAddedBannar
 }

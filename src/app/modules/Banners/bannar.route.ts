@@ -12,4 +12,8 @@ route.post('/bannar-create', checkAuth, upload.single("file"), bannerController.
 
 route.get('/bannar-get', checkAuth, bannerController.getBannars)
 route.delete('/delete-bannar/bannarId', isAdmin, bannerController.deleteBannar)
+
+
+route.get('/recenAddedBannar', checkAuth , isAdmin , bannerController.recenAddedBannar)
+
 export const BannarRoute = route

@@ -29,7 +29,7 @@ const videoUpload = catchAsync(async (req: Request, res: Response, next: NextFun
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const deleteVideo = catchAsync(async (req: Request, res: Response , next : NextFunction) => {
+const deleteVideo = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
     const id = req.params.id as string
@@ -46,7 +46,7 @@ const deleteVideo = catchAsync(async (req: Request, res: Response , next : NextF
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getAllVideos = catchAsync(async (req: Request, res: Response,next : NextFunction) => {
+const getAllVideos = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const query = req.query
     const data = await videoService.getAllVideos(query as Record<string, string>)
@@ -63,10 +63,24 @@ const getAllVideos = catchAsync(async (req: Request, res: Response,next : NextFu
 })
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const recentAddedVideo = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const ans = await videoService.recentAddedVideo()
+
+    sendResponse(res, {
+        data: ans,
+        message: 'Recent Added Video!',
+        statusCode: httpStatus.OK,
+        success: true
+    })
+})
+
 
 export const videoController = {
 
     videoUpload,
     deleteVideo,
-    getAllVideos
+    getAllVideos,
+    recentAddedVideo
 }

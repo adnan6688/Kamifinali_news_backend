@@ -17,11 +17,10 @@ const ctr = catchAsync(async (req: Request, res: Response, next: NextFunction) =
         throw new AppError(statusCode.BAD_REQUEST, "NewsId or BannarId must be include!")
     }
 
-
     const type = req.params.type as ctrType
     const action = req.params.action as TAction
     req.body.type = type
-    const user = req.user.id
+    const user = req.user?.id
     req.body.user = user
 
 
@@ -53,6 +52,22 @@ const ctr = catchAsync(async (req: Request, res: Response, next: NextFunction) =
     })
 })
 
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getCTRAnalytics = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const query = req?.query
+    const data = await ctrService.getCTRAnalytics(query as Record<string, string>)
+
+
+    sendResponse(res, {
+        success: true,
+        message: 'CTR OF ALL',
+        data,
+        statusCode: statusCode.OK
+    })
+})
+
 export const ctrController = {
-    ctr
+    ctr, getCTRAnalytics
 }
